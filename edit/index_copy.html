@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/font-awesome.min.css">
+    <link rel="stylesheet" href="styles/index.css">
+    <script src="//cdn.bootcss.com/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdn.bootcss.com/vue/1.0.22/vue.min.js"></script>
+</head>
+<body>
+
+
+{include file="library/index/shop_info.lbi"}
+{include file="library/index/navbar.lbi"}
+</body>
+<script>
+    $(function () {
+        $('.edit span').click(function () {
+            $('.edit-box').fadeOut();
+            $(this).parents('.lbi').find('.edit-box').fadeIn();
+        });
+
+        $('.lbi-show').hover(function () {
+            $(this).find('.edit').stop().animate({
+                opacity: 1
+            },'slow');
+        }, function () {
+            $(this).find('.edit').stop().animate({
+                opacity:0
+            },'slow');
+        });
+
+    });
+
+</script>
+</html>

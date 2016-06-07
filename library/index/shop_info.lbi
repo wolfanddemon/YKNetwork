@@ -1,0 +1,189 @@
+<section class="lbi" id="shop-info">
+    <div class="lbi-show">
+        <div v-if="current_lbi_id==1" class="shop-info-1">
+            <div class="heading">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-square-o fa-stack-2x"></i>
+                    <i class="fa fa-twitter fa-stack-1x"></i>
+                </span>
+                <div class="pull-right">
+                  <span class="fa-stack fa-lg">
+                      <i class="fa fa-circle fa-stack-2x"></i>
+                      <i class="fa fa-user fa-stack-1x fa-inverse"></i>
+                   </span>
+                    个人中心
+                </div>
+            </div>
+ 
+            <div class="top-bg bg-success" style="background-image: url({{detail_items[1].item_img}})"></div>
+            <div class="shop-name">
+                <img src="{{detail_items[0].item_img}}" alt="">
+                <div>
+                    {{detail_items[0].item_title}}
+                    <i class="fa fasearch pull-right"></i>
+                </div>
+            </div>
+        </div>
+        <div v-if="current_lbi_id==2" class="shop-info-2">
+            <div class="shop-name clearfix">
+                <img src="{{simple_items[0].item_img}}" alt="">
+                <div class="name">
+                    {{simple_items[0].item_title}}
+                </div>
+            </div>
+        </div>
+        <div class="edit"><span>编辑</span></div>
+    </div>
+    <div class="edit-box panel panel-danger">
+        <div class="panel-heading">
+            <h3 class="panel-title">编辑店头</h3>
+        </div>
+        <div class="panel-body">
+            <p>
+                当前样式:
+                <span class="text-danger current_title">{{current_lbi_title}}</span>
+            </p>
+            <div class="form-group">
+                <p>选择样式</p>
+                <select class="select-style form-control" v-on:change="switch" v-model="selected">
+                    <option v-for="lbi in lbis" v-bind:value="lbi.lbi_id">{{lbi.lbi_title}}</option>
+                </select>
+            </div>
+
+            <!--表单列表-->
+            <section v-if="current_lbi_id==index+1" v-for="(index,items) in items_all">
+                <div v-for="(index,item) in items" class="item-group">
+                    <div class="item-img" style="background-image: url({{item.item_img}})">
+                        <input name="{{item.item_id}}" type="file" v-on:change="upload_img"/>
+                        <span class="fa fa-plus fa-2x" style="line-height: 100px"></span>
+                    </div>
+
+                    <div v-if="index==0" class="form-group">
+                        <input class="form-control" type="text" placeholder="请输入名称" v-model='item.item_title'>
+                    </div>
+                </div>
+            </section>
+
+
+            <div class="text-right from-group">
+                <button class="btn btn-default" v-on:click="reset">取消</button>
+                <button class="btn  btn-danger" v-on:click="change">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var shop_info = new Vue({
+            el: '#shop-info',
+            created: function () {
+                var data = {$shop_info};
+                this.dwt_id = parseInt(data.dwt_id);
+                this.type_id = parseInt(data.type_id);
+                this.current_lbi_id = parseInt(data.current_lbi_id);
+                this.current_lbi_title = data.current_lbi_title;
+                this.item_num = parseInt(data.item_num);
+                this.max_num = parseInt(data.max_num);
+                this.selected = this.current_lbi_id;
+                this.lbis = data.lbis;
+                this.detail_items = get_arr(this.lbis.detail.items);
+                this.simple_items = get_arr(this.lbis.simple.items);
+                this.items_all = [];
+                this.items_all.push(this.detail_items);
+                this.items_all.push(this.simple_items);
+            },
+            data: {
+                selected: '',
+                dwt_id: '',
+                type_id: '',
+                current_lbi_id: '',
+                current_lbi_title: '',
+                item_num: '',
+                max_num: '',
+                lbis: '',
+                items_all: '',
+                simple_items: '',
+                text_items: ''
+            },
+            methods: {
+                switch: function () {
+                    this.current_lbi_id = this.selected;
+                    if (this.current_lbi_id == 1) {
+                        this.item_num = this.detail_items.length;
+                        this.max_num = this.lbis.detail.max_num;
+                    } else if (this.current_lbi_id == 2) {
+                        this.item_num = this.simple_items.length;
+                        this.max_num = this.lbis.simple.max_num;
+                    }
+                },
+                change: function () {
+                    var lbi_id = this.current_lbi_id;
+                    if (lbi_id == 1) {
+                        post_ajax(this.dwt_id, this.type_id, lbi_id, this.item_num, this.detail_items);
+                    } else if (lbi_id == 2) {
+                        post_ajax(this.dwt_id, this.type_id, lbi_id, this.item_num, this.simple_items);
+                    }
+                },
+                upload_img: function (event) {
+                    var target = $(event.target);
+                    var index = parseInt(target.parents('.item-group').index());
+                    //创建FormData对象
+                    var data = new FormData();
+                    //为FormData对象添加数据
+                    $.each(target[0].files, function (i, file) {
+                        data.append('upload_img', file);
+                    });
+                    $.ajax({
+                        url: 'dwt_upload_img.php',
+                        type: 'POST',
+                        data: data,
+                        cache: false,
+                        contentType: false,        //不可缺参数
+                        processData: false,        //不可缺参数
+                        success: function (data) {
+                            if (data) {
+                                alert(data);
+                                if (shop_info.current_lbi_id == 1) {
+                                    shop_info.detail_items[index]['item_img'] = data;
+                                } else if (shop_info.current_lbi_id == 2) {
+                                    shop_info.simple_items[index]['item_img'] = data;
+                                }
+                                console.log(shop_info.simple_items);
+                            } else {
+                                alert('图片不符要求');
+                            }
+                        },
+                        error: function () {
+                            alert('上传失败');
+                        }
+                    });
+                }
+            }
+        });
+
+        function post_ajax(dwt_id, type_id, lbi_id, item_num, items, target) {
+            $.post('dwt_edit.php', {
+                dwt_id: dwt_id,
+                type_id: type_id,
+                lbi_id: lbi_id,
+                item_num: item_num,
+                lbi_items: items
+            }, function (data) {
+                var title = $(target).parents('.edit-box').find('.select-style option:selected').html();
+                $(target).parents('.edit-box').find('.current_title').html(title);
+                if (data) {
+                    alert('修改成功');
+                }
+            })
+        }
+        function get_arr(obj) {
+            var temp = [];
+            for (var i in obj) {
+                temp.push(obj[i]);
+            }
+            return temp;
+        }
+
+    </script>
+</section>
+
+

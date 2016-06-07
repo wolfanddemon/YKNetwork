@@ -1,0 +1,208 @@
+<section class="lbi" id="shop-info">
+    <style>
+        #shop-info {
+            position: relative;
+            width: 400px;
+        }
+
+        #shop-info .heading {
+            overflow: hidden
+        }
+
+        #shop-info .top-bg {
+            height: 100px;
+            background: no-repeat;
+            background-size: 100% 100%;
+        }
+
+        #shop-info .shop-name {
+            padding: 20px 0;
+            overflow: hidden
+        }
+
+        #shop-info .shop-name > img {
+            float: left;
+            width: 20%;
+            border-radius: 50%;
+            margin: 0 20px;
+        }
+
+        #shop-info .shop-name > div {
+            overflow: hidden
+        }
+    </style>
+    <div class="lbi-show">
+        <div v-if="current_lbi_id==1" class="shop-info-1">
+            <div class="heading">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-square-o fa-stack-2x"></i>
+                    <i class="fa fa-twitter fa-stack-1x"></i>
+                </span>
+                <div class="pull-right">
+                  <span class="fa-stack fa-lg">
+                      <i class="fa fa-circle fa-stack-2x"></i>
+                      <i class="fa fa-user fa-stack-1x fa-inverse"></i>
+                   </span>
+                    个人中心
+                </div>
+            </div>
+
+            <div class="top-bg bg-success" style="background-image: url({{detail_items[1].item_img}})"></div>
+            <div class="shop-name">
+                <img src="{{detail_items[0].item_img}}" alt="">
+                <div>
+                    {{detail_items[0].item_title}}
+                    <i class="fa fasearch pull-right"></i>
+                </div>
+            </div>
+        </div>
+        <div v-if="current_lbi_id==2" class="shop-info-2">
+            <div class="shop-name clearfix">
+                <img src="{{simple_items[0].item_img}}" alt="">
+                <div class="name">
+                    {{simple_items[0].item_title}}
+                </div>
+            </div>
+        </div>
+        <span class="edit">编辑</span>
+    </div>
+    <div class="edit-box panel panel-danger">
+        <div class="panel-heading">
+            <h3 class="panel-title">编辑店头</h3>
+        </div>
+        <div class="panel-body">
+            <p>
+                当前样式:
+                <span class="text-danger current_title">{{current_lbi_title}}</span>
+            </p>
+            <div class="form-group">
+                <p>选择样式</p>
+                <select class="select-style form-control" v-on:change="switch" v-model="selected">
+                    <option v-for="lbi in lbis" v-bind:value="lbi.lbi_id">{{lbi.lbi_title}}</option>
+                </select>
+            </div>
+
+            <!--表单列表-->
+            <section v-if="current_lbi_id==index+1" v-for="(index,items) in items_all">
+                <div v-for="(index,item) in items" class="item-group">
+                    <div class="item-img" style="background-image: url({{item.item_img}})">
+                        <input name="{{item.item_id}}" type="file" v-on:change="upload_img"/>
+                        <span class="fa fa-plus fa-2x" style="line-height: 100px"></span>
+                    </div>
+
+                    <div v-if="index==0" class="form-group">
+                        <input class="form-control" type="text" placeholder="请输入名称" v-model='item.item_title'>
+                    </div>
+                </div>
+            </section>
+
+
+            <div class="text-right from-group">
+                <button class="btn btn-default" v-on:click="reset">取消</button>
+                <button class="btn  btn-danger" v-on:click="change">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var shop_info = new Vue({
+            el: '#shop-info',
+            data: {
+                selected: '',
+                dwt_id: '',
+                type_id: '',
+                current_lbi_id: '',
+                current_lbi_title: '',
+                item_num: '',
+                max_num: '',
+                lbis: '',
+                items_all: '',
+                simple_items: '',
+                text_items: ''
+            },
+            methods: {
+                init: function () {
+                    var data = {$shop_info};
+                    this.dwt_id = parseInt(data.dwt_id);
+                    this.type_id = parseInt(data.type_id);
+                    this.current_lbi_id = parseInt(data.current_lbi_id);
+                    this.current_lbi_title = data.current_lbi_title;
+                    this.item_num = parseInt(data.item_num);
+                    this.max_num = parseInt(data.max_num);
+                    this.selected = this.current_lbi_id;
+                    this.lbis = data.lbis;
+                    this.detail_items = this.get_arr(this.lbis.detail.items);
+                    this.simple_items = this.get_arr(this.lbis.simple.items);
+                    this.items_all = [];
+                    this.items_all.push(this.detail_items);
+                    this.items_all.push(this.simple_items);
+                },
+                switch: function () {
+                    this.current_lbi_id = this.selected;
+                    if (this.current_lbi_id == 1) {
+                        this.item_num = this.icon_items.length;
+                        this.max_num = this.lbis.icon.max_num;
+                    } else if (this.current_lbi_id == 2) {
+                        this.item_num = this.text_items.length;
+                        this.max_num = this.lbis.text.max_num;
+                    }
+                },
+                change: function (event) {
+                    var lbi_id = this.current_lbi_id;
+                    if (lbi_id == 1) {
+                        this.post_ajax(this.dwt_id, this.type_id, lbi_id, this.item_num, this.icon_items, event.target);
+                    } else if (lbi_id == 2) {
+                        this.post_ajax(this.dwt_id, this.type_id, lbi_id, this.item_num, this.text_items, event.target);
+                    }
+                },
+                post_ajax: function (dwt_id, type_id, lbi_id, item_num, items, target) {
+                    $.post('dwt_edit.php', {
+                        dwt_id: dwt_id,
+                        type_id: type_id,
+                        lbi_id: lbi_id,
+                        item_num: item_num,
+                        lbi_items: items
+                    }, function (data) {
+                        var title = $(target).parents('.edit-box').find('.select-style option:selected').html();
+                        $(target).parents('.edit-box').find('.current_title').html(title);
+                        if (data) {
+                            alert('修改成功');
+                        }
+                    })
+
+                },
+                get_arr: function (obj) {
+                    var temp = [];
+                    for (var i in obj) {
+                        temp.push(obj[i]);
+                    }
+                    return temp;
+
+                }
+            }
+        });
+        function post_ajax(dwt_id, type_id, lbi_id, item_num, items, target) {
+            $.post('dwt_edit.php', {
+                dwt_id: dwt_id,
+                type_id: type_id,
+                lbi_id: lbi_id,
+                item_num: item_num,
+                lbi_items: items
+            }, function (data) {
+                var title = $(target).parents('.edit-box').find('.select-style option:selected').html();
+                $(target).parents('.edit-box').find('.current_title').html(title);
+                if (data) {
+                    alert('修改成功');
+                }
+            })
+        }
+        function get_arr(obj) {
+            var temp = [];
+            for (var i in obj) {
+                temp.push(obj[i]);
+            }
+            return temp;
+        }
+        shop_info.init();
+    </script>
+</section>
