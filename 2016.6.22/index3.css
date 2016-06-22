@@ -1,0 +1,62 @@
+body {
+    background: lightblue;
+
+}
+
+ul,
+li {
+    list-style: none;
+}
+
+.lib{
+    position:relative;
+    width:50%;
+    text-align:center;
+}
+
+.lib img{
+  width:30%;
+    margin:20px;
+}
+
+.display-box{
+    margin:10px;
+    width: 100%;
+    padding: 20px;
+    border-style: dotted;
+    display: block;
+
+}
+
+.add-box{
+    background-color: rgba(77, 129, 171, 0.65);
+    position: absolute;
+    left:110%;
+    top: 0;
+    width: 220px;
+    height:200px;
+    display:none;
+    padding:10px
+}
+
+.edit-box {
+    background-color: rgba(77, 129, 171, 0.65);
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 220px;
+
+}
+
+.button1 {
+    padding: 8px 16px;
+    display: inline-block;
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50;
+}
+
+.button1:hover {
+    background-color: #4CAF50;
+    color: white;
+}

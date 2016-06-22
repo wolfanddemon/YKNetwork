@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta   http-equiv="Expires"   CONTENT="0">
+    <meta   http-equiv="Cache-Control"   CONTENT="no-cache">
+    <meta   http-equiv="Pragma"   CONTENT="no-cache">
+
+
+    <title>Title</title>
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/font-awesome.min.css">
+    <link rel="stylesheet" href="styles/index3.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/vue.min.js"></script>
+
+</head>
+<body>
+
+<!--图片导航模板-->
+<template id="t41">
+    <section class="row_{{row}} lib">
+        <!------------------------------display box--------------------------------->
+        <div class="display-box">
+            <img src="{{imgUrl}}" alt="图片导航img" >
+            <span> {{libTitle}}</span>
+                <div>
+                    <button class="button1" v-on:click="editLib">编辑</button>
+                    <button class="button1 addLibBtn" v-on:click="showOptions">增加</button>
+                    <button class="button1" v-on:click="deleteLib">删除</button>
+                </div>
+        </div>
+        <!------------------------------add box--------------------------------->
+        <div class="add-box">
+            <select v-model="selected"  v-on:change="addLib" >
+                <option selected>添加文字导航</option>
+                <option>添加图片导航</option>
+                <option>添加添加标题栏</option>
+            </select>
+            <button class="button1" v-on:click="addLib">确认</button>
+        </div>
+        <!------------------------------edit box--------------------------------->
+        <div v-if="edit" class="edit-box">
+            <p>hi</p>
+        </div>
+    </section>
+</template>
+
+<!--文本导航模板-->
+<template id="t42">
+    <section class="row_{{row}} lib">
+
+        <div class="display-box">
+            <span> {{libTitle}}</span>
+            <div>
+                <button class="button1" v-on:click="editLib">编辑</button>
+                <button class="button1 addLibBtn" v-on:click="showOptions">增加</button>
+                <button class="button1" v-on:click="deleteLib">删除</button>
+            </div>
+        </div>
+        <!------------------------------add Lib--------------------------------->
+        <div  class="add-box">
+            <select v-model="selected">
+                <option selected>添加文字导航</option>
+                <option>添加图片导航</option>
+                <option>添加添加标题栏</option>
+            </select>
+            <button class="button1"  v-on:click="addLib">确认</button>
+        </div>
+        <!------------------------------edit box--------------------------------->
+
+    </section>
+</template>
+
+<!--标题栏模板-->
+<template id="t11">
+    <section class="row_{{row}} lib">
+
+        <div class="display-box">
+            <span>店铺名称： {{libTitle}}</span>
+            <img src="{{imgUrl}}" alt="标题栏图片" >
+            <div>
+                <button class="button1" v-on:click="editLib">编辑</button>
+                <button class="button1 addLibBtn" v-on:click="showOptions">增加</button>
+                <button class="button1" v-on:click="deleteLib">删除</button>
+            </div>
+        </div>
+        <!------------------------------add box--------------------------------->
+        <div  class="add-box">
+            <p>请选择需要添加的模块</p>
+            <select v-model="selected">
+                <option selected>添加文字导航</option>
+                <option>添加图片导航</option>
+                <option>添加添加标题栏</option>
+            </select>
+            <button class="button1" v-on:click="addLib">确认</button>
+        </div>
+        <!------------------------------edit box--------------------------------->
+
+    </section>
+</template>
+
+
+<div id="home">
+    <div id="hook"></div>
+    <div id="add-lib" class="lib" style="margin:10px; padding:30px; background: lightcyan; text-align: center">
+            <p >+</p>
+            <span>选择想要添加的模块</span>
+    </div>
+
+</div>
+
+<!--用于保存整个页面数据到数据库的按钮-->
+<!--div class="dcr-footer">
+    <div class="dcr-footer-btn">
+        <button class="btn btn-default" >保存页面</button>
+    </div>
+</div-->
+
+<script>
+
+    //下面这段代码只用于刷新一次页面
+    window.onload = function() {
+        if(!window.location.hash) {
+            window.location = window.location + '#loaded';
+            window.location.reload();
+        }
+    };
+
+    //
+    var pageInfo = {$page_info};
+
+    //这里假设我们不需要用到dwt_id
+    //每一次展示之前都要将pageInfo根据row的大小排序(确保浏览器渲染组件的顺序由row的值来决定)
+    pageInfo.sort(function(x, y){
+        return (x['row'] - y['row']);
+    });
+
+    for(let i=0;i<pageInfo.length;i++) {
+
+        pageInfo[i]['row']=parseInt(pageInfo[i]['row']);
+        console.log(pageInfo[i]['lib_id']);
+        $("#home").append("<row_"+pageInfo[i]['row']+"></row_" +pageInfo[i]['row']+">");
+
+        Vue.component('row_'+pageInfo[i]['row'], {
+            template: '#t' + pageInfo[i]['lib_id'],
+            data: function () {
+               //console.log(i);
+                return{
+                //control data
+                selected : '',
+                count : i,
+                add : false,
+                edit : false,
+
+                //lib data
+                libId : pageInfo[i]['lib_id'],
+                libTitle : pageInfo[i]['lib_title'],
+                row : pageInfo[i]['row'],
+                imgUrl : pageInfo[i]['img_url']
+               // itemUrl : testInfo[i]['item_url'],
+               // libNum : testInfo[i]['lib_num'],
+               // libNumMax : testInfo[i]['lib_num_max']
+                }
+            },
+            methods:{
+                deleteLib : function(){
+                   //这里需要修改一下libNum之类的细节，现在不作任何限制
+                    //在pageInfo中删除选中的Lib
+                    pageInfo.splice((this).count,1);
+
+                    //更新后面Lib的row值
+                    var index=(this).count;
+                    console.log(this);
+                    for(index;index<pageInfo.length;index++){
+                        pageInfo[index]['row']=pageInfo[index]['row']-1;
+                    }
+                    //到这一步，所有的数据都被正确保存在testInfo中
+                    post_ajax(pageInfo);
+                    //延时200毫秒后刷新
+                    setTimeout(function(){ location.reload(); },500);
+                },
+
+                showOptions : function(){
+                    //console.log(this)
+                    //this.add=true;
+                },
+
+                addLib:function(){
+                    //这里需要修改一下libNum之类的细节，现在不作任何限制
+                    alert('您选择了：'+(this).selected);
+                    this.add=false;
+
+                    //业务逻辑真正开始的地方
+                    var pointer=this;
+                    switch (pointer.selected) {
+                        case "添加文字导航":
+                            addLibHelper(pointer,"42");
+                            break;
+                        case "添加图片导航":
+                            addLibHelper(pointer,"41");
+                            break;
+                        default:
+                            addLibHelper(pointer,"11");
+                    }
+                    //把修改后的pageInfo保存到数据库
+                    post_ajax(pageInfo);
+                    setTimeout(function(){  location.reload(); },500);
+                },
+
+                editLib:function(){
+                    this.edit=true;
+                }
+            }
+        });
+    }
+    new Vue({
+        el: '#home'
+    });
+
+    //用于展开添加
+    $('.addLibBtn').on('click',function () {
+        //alert('hi');
+        var addBox= $(this).parents('section').find('.add-box');
+        $('.add-box').not(addBox).fadeOut();
+        addBox.slideToggle();
+    });
+
+
+
+    /****************************************以下代码是此js页面的公用函数****************************/
+
+    function post_ajax(pageInfo) {
+        //.post(url,parameters,callback)
+        //url         (字符串)服务器端资源地址。
+        //parameter   (对象)需要传递到服务器端的参数。 参数形式为“键/值”。
+        //callback    (函数)在请求完成时被调用。该函数参数依次为响应体和状态。
+        $.post('update_info.php', {
+            page_info:pageInfo
+        }, function (result) {
+            if (result) {
+                console.log(result);
+            }
+        })
+    }
+
+    /**
+     * addLibHelper(pointer,libid)
+     * @param pointer 指定哪个组件调用了“增加组件”功能
+     * @param libid   指定需要增加哪种组件
+     */
+    function addLibHelper(pointer,libid) {
+
+        //先把pageInfo深拷贝到temp中
+        var temp = JSON.parse(JSON.stringify(pageInfo));
+
+        //找到我们需要插入行的位置，temp[0]只是随便选一个来初始化一下
+        temp[0]['lib_id'] = libid;
+        temp[0]['row'] = (pointer).row + 1;
+        temp[0]['img_url']="./files/user.png";
+        temp[0]['lib_title']="这是新增的组件";
+
+        //插入新行
+        pageInfo.splice((pointer).count + 1, 0, temp[0]);
+
+        //对剩下行进行更新
+        var index = (pointer).count + 2;
+
+        for (index; index < pageInfo.length; index++) {
+            pageInfo[index]['row'] = pageInfo[index]['row'] + 1;
+        }
+
+    }
+
+
+    //取出pageInfo中每一个条目的lib_id
+    function get_lib_id(arr){
+        var temp=[];
+        for(var i in arr){
+            temp.push(arr[i]['lib_id']);
+        }
+        return temp;
+    }
+
+
+</script>
+</body>
+</html>
