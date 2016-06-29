@@ -1,0 +1,284 @@
+body {
+    background: #f8f8f8;
+    text-align: center;
+}
+
+header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: RGBA(0,0,0,.8);
+    padding: 5px;
+    color:white;
+    z-index: 1099;
+}
+
+header p{
+    margin: 10px;
+}
+
+article{
+    background: #eee;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    margin: 80px 5%;
+}
+
+ul, li {
+    list-style: none;
+}
+
+/*span{
+    display: inline-block;
+    width: inherit;
+    overflow: hidden;
+}*/
+
+input[type="file"] {
+    display: none;
+}
+
+footer{
+    height: 60px;
+    background: RGBA(0,0,0,.8);
+    line-height: 60px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1099;
+}
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+.save-page{
+    border-radius: 2px;
+    line-height: 30px;
+    cursor: pointer;
+    color: white;
+    width: 100px;
+    background: #4a83dc;
+    display: inline-block;
+}
+
+.lib{
+    position:relative;
+    width:300px;
+    text-align:center;
+}
+
+/******************display-box的样式**************************/
+.display-box-special{
+    background-color: white;
+    width: 99%;
+    height: 200px;
+    margin: 0px auto 10px auto;
+
+    display: block;
+}
+
+
+
+.display-box {
+
+    background-color: white;
+    width: 99%;
+
+    margin: 0px auto 10px auto;
+
+    padding: 20px;
+    display: block;
+
+}
+
+.display-box img{
+    width:35%;
+    margin:20px;
+}
+
+.display-box .auxiliary-area {
+    position: absolute;
+    top: 0;
+    right: -45px;
+    width: 15%;
+    display: none;
+    height: 110px;
+    cursor: default;
+
+}
+
+.display-box .auxiliary-area p{
+    background: #bfbfbf;
+    color: white;
+}
+
+.display-box .auxiliary-area p:hover{
+    background: #666;
+}
+
+.display-box.selected-box{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transform: scale(1.05,1.05);
+    border:1px blue solid !important;
+
+
+}
+
+.display-box:hover{
+    border:1px black dashed ;
+}
+/*********************edit-box的样式**************************/
+.edit-box{
+    position: absolute;
+    left:120%;
+    top: 0;
+    display:none;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom: 25px;
+    width: 100%;
+    padding: 20px;
+
+}
+
+.edit-box span{
+    position: absolute;
+    right: 5%;
+    color: red;
+    cursor: pointer;
+}
+
+.edit-box>.save-btn{
+    margin:5%;
+    cursor:pointer;
+}
+
+/*********************add-box的样式**************************/
+.add-box{
+    width: 620px;
+    position: fixed;
+    top: 20%;
+    right: 4%;
+
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+    padding: 20px;
+    z-index: 100;
+    display: none;
+
+}
+
+.add-box img{
+    width:80%;
+    border:2px solid #666
+}
+
+
+.add-box button {
+    padding:8px 16px;
+    display: inline-block;
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50;
+}
+
+
+.add-box .btn-group{
+    margin:10px;
+    position: relative;
+    top: 40%;
+}
+
+.add-box span{
+    position: absolute;
+    right: 5%;
+    color: red;
+    cursor: pointer;
+}
+
+/************************************增加框中img的样式************************************/
+.img-item{
+    display: inline-block;
+    width:45%;
+    height:20%;
+    margin:10px;
+
+}
+
+.img-item img:hover {
+    border: 1px solid blue;
+    cursor:pointer;
+}
+
+/***************当鼠标点击到图片上的时候才动态增减这个类，用于框住选中的img***********/
+.img-border {
+    border: 3px solid red !important;
+}
+
+.img-group{
+    display: flex;
+}
+
+/**********************************增加框中用于分页的样式****************************/
+ul.pagination {
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+
+ul.pagination li {
+    display: inline;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: black;
+}
+
+ul.pagination li:hover {
+    cursor: pointer;
+}
+
+hr{
+    margin: 5px;
+}
+
+/**************************用于展示不同的分割线**************************/
+.hr1{
+    position: absolute;
+    top: 22%;
+    height: 4px;
+    border: none;
+    color: #333;
+    background-color: #333;
+    width: 60px;
+}
+
+.hr2{
+    position: absolute;
+    left: 12%;
+    top: 22%;
+    height: 4px;
+    border: none;
+    color: #333;
+    background-color: #333;
+    width: 60px;
+}
+
+.hr3{
+    position: absolute;
+    left: 24%;
+    top: 22%;
+    height: 4px;
+    border: none;
+    color: #333;
+    background-color: #333;
+    width: 60px;
+}
+
