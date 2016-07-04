@@ -1,0 +1,290 @@
+#hook{
+    z-index: 1
+}
+
+body {
+    background: #f8f8f8;
+    text-align: center;
+}
+
+header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: RGBA(0,0,0,.8);
+    padding: 5px;
+    color:white;
+    z-index: 1099;
+}
+
+header p{
+    margin: 10px;
+}
+
+article{
+    background: #eee;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    margin: 80px 5%;
+}
+
+ul, li {
+    list-style: none;
+}
+
+footer{
+    height: 60px;
+    background: RGBA(0,0,0,.8);
+    line-height: 60px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1099;
+}
+
+.lib{
+    position:relative;
+    width:300px;
+    text-align:center;
+}
+
+/******************display-box的样式**************************/
+.display-box {
+    background-color: white;
+    width: 99%;
+    margin: 0px auto 10px auto;
+    display: block;
+}
+
+.display-box .auxiliary-area {
+    position: absolute;
+    top: 0;
+    right: -45px;
+    width: 15%;
+    display: none;
+    height: 110px;
+    cursor: default;
+
+}
+
+.display-box .auxiliary-area p{
+    background: #bfbfbf;
+    color: white;
+}
+
+.display-box .auxiliary-area p:hover{
+    background: #666;
+}
+
+.display-box.selected-box:before{
+    content: "";
+    box-sizing: content-box;
+    border: 2px solid #4a83dc;
+    background-color: #ffffff;
+    box-shadow: 0 0 25px rgba(0, 0, 0,0.5);
+    position: absolute;
+    z-index: -1;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+}
+
+.mouse-over-display-box{
+    /*用outline就是position：absolute 的 border 可以不占位置*/
+    outline:1px black dashed ;
+    outline-offset: 1px;
+}
+
+/*********************edit-box的样式**************************/
+.edit-box{
+    position: absolute;
+    left:120%;
+    top: 0;
+    display:none;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom: 25px;
+    width: 100%;
+    padding: 20px;
+
+}
+
+.edit-box span{
+    position: absolute;
+    right: 5%;
+    color: red;
+    cursor: pointer;
+}
+
+.edit-box>.save-btn{
+    margin:5%;
+    cursor:pointer;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+/*input img file*/
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.save-page{
+    border-radius: 2px;
+    line-height: 30px;
+    cursor: pointer;
+    color: white;
+    width: 100px;
+    background: #4a83dc;
+    display: inline-block;
+}
+
+
+/*********************add-box的样式**************************/
+.add-box{
+    width: 620px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -310px;
+    margin-top:-150px;
+
+
+    background-color: white;
+    box-shadow: 0 4px 8px 1024px rgba(0, 0, 0, 0.8), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+    padding: 20px;
+    z-index: 100;
+    display: none;
+
+}
+
+.add-box img{
+    width:80%;
+    border:2px solid #666
+}
+
+.add-box button {
+    padding:8px 16px;
+    display: inline-block;
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50;
+}
+
+.add-box span{
+    position: absolute;
+    right: 5%;
+    color: red;
+    cursor: pointer;
+}
+
+.add-box .img-item{
+    display: inline-block;
+    width:45%;
+    height:20%;
+    margin:10px;
+
+}
+
+.add-box .img-item img:hover {
+    outline: 1px solid blue;
+    cursor:pointer;
+}
+
+.add-box .img-border {
+    outline: 1px solid red !important;
+}
+
+.add-box .img-group{
+    display: flex;
+}
+
+.add-box ul.pagination {
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+
+.add-box ul.pagination li {
+    display: inline;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: black;
+}
+
+.add-box ul.pagination li:hover {
+    cursor: pointer;
+}
+
+.add-box hr{
+    margin: 5px;
+}
+
+.add-box .hr1{
+    position: absolute;
+    top: 22%;
+    height: 4px;
+    border: none;
+    color: #333;
+    background-color: #333;
+    width: 60px;
+}
+
+.add-box .hr2{
+    position: absolute;
+    left: 12%;
+    top: 22%;
+    height: 4px;
+    border: none;
+    color: #333;
+    background-color: #333;
+    width: 60px;
+}
+
+.add-box .hr3{
+    position: absolute;
+    left: 24%;
+    top: 22%;
+    height: 4px;
+    border: none;
+    color: #333;
+    background-color: #333;
+    width: 60px;
+}
+
+
+/************************************一下是针对不同lib template的样式*****************************************/
+.lib42,.lib41,#last-add-box {
+    padding:20px;
+    background-color: white;
+    width: 90%;
+    margin: 10px auto 10px auto;
+    display: block;
+}
+
+.lib12{
+    padding:20px;
+    background-color: white;
+    width: 99%;
+    margin: 10px auto 10px auto;
+    display: block;
+}
+
+.lib42 img,.lib41 img,.lib12 img{
+    width:40%;
+}
+
+.lib13 hr{
+    border-top: 2px solid #ccc;
+}

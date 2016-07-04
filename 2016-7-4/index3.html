@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/index3.css">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <link rel="stylesheet" href="styles/jquery.editable-select.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/vue.min.js"></script>
+
+
+
+</head>
+
+<body>
+<!--搜索功能模板-->
+<template id="t11">
+    <section class="row{{row}} lib">
+    </section>
+</template>
+
+<!--进入商店模板-->
+<template id="t12">
+    <section id="count{{count}}" class="lib">
+        <!------------------------------display box--------------------------------->
+        <div class="display-box lib{{libId}}" >
+            <img src="{{imgUrl1}}" alt="标题栏图片" >
+            <span>店铺名称： {{libTitle}}</span>
+            <div  class="auxiliary-area">
+                <!--p class=" edit-lib-btn" >编辑</p-->
+                <p class="move-up-btn" v-on:click="moveUpLib">上移</p>
+                <p class="move-down-btn" v-on:click="moveDownLib">下移</p>
+                <p class=" add-lib-btn" data-count={{count}} onclick="resultFun=addLib({{count}})" >增加</p>
+                <p  v-on:click="deleteLib">删除</p>
+            </div>
+        </div>
+        <!------------------------------edit box--------------------------------->
+        <div class="edit-box">
+            <p>这是编辑框<span class="cancel-edit-box">X</span></p>
+            <input class="form-control" type="text" placeholder="请输入名称" v-model='libTitle' v-on:change="save">
+            <div style="padding:10px;margin:10px">
+                <label class="custom-file-upload">
+                    <input type="file"  v-on:change="upload_img"/>
+                    Custom Upload
+                </label>
+            </div>
+        </div>
+    </section>
+</template>
+
+<!--辅助线模板-->
+<template id="t13">
+    <section class="row{{row}} lib">
+        <div class="display-box lib{{libId}}"  >
+            <div style="padding:5px; background: #eee">
+                <div style="background:#bbb; width:90% ;height: 1px;margin:auto;"></div>
+            </div>
+            <div  class="auxiliary-area">
+                <!--p class=" edit-lib-btn" >编辑</p-->
+                <p class="move-up-btn" v-on:click="moveUpLib">上移</p>
+                <p class="move-down-btn" v-on:click="moveDownLib">下移</p>
+                <p class=" add-lib-btn" data-count={{count}}  onclick="resultFun=addLib({{count}})">增加</p>
+                <p  v-on:click="deleteLib">删除</p>
+            </div>
+        </div>
+    </section>
+</template>
+
+<!--地图模板-->
+<template id="t14">
+    <section class="row{{row}} lib">
+        <!------------------------------display box--------------------------------->
+        <div  class="display-box lib{{libId}}" >
+
+                <div id="map" style="height:200px"></div>
+
+            <div  class="auxiliary-area">
+                <!--p class=" edit-lib-btn" >编辑</p-->
+                <p class="move-up-btn" v-on:click="moveUpLib">上移</p>
+                <p class="move-down-btn" v-on:click="moveDownLib">下移</p>
+                <p class=" add-lib-btn" data-count={{count}}  onclick="resultFun=addLib({{count}})">增加</p>
+                <p  v-on:click="deleteLib">删除</p>
+            </div>
+        </div>
+        <!------------------------------edit box--------------------------------->
+        <!--此模块没有什么可以编辑的-->
+    </section>
+</template>
+
+<!--图片导航模板-->
+<template id="t41">
+    <section id="count{{count}}" class="lib">
+
+        <!------------------------------display box--------------------------------->
+        <div class="display-box lib{{libId}}">
+            <img src="{{imgUrl1}}" alt="图片导航img" >
+            <span> {{libTitle}}</span>
+            <div  class="auxiliary-area">
+                <!--p class=" edit-lib-btn" >编辑</p-->
+                <p class="move-up-btn" v-on:click="moveUpLib">上移</p>
+                <p class="move-down-btn" v-on:click="moveDownLib">下移</p>
+                <p class=" add-lib-btn" data-count={{count}}   onclick="resultFun=addLib({{count}})">增加</p>
+                <p  v-on:click="deleteLib">删除</p>
+            </div>
+        </div>
+        <!---------------------------------edit box--------------------------------->
+
+        <div class="edit-box">
+            <p>这是编辑框<span class="cancel-edit-box">X</span></p>
+            <input class="form-control" type="text" placeholder="请输入名称" v-model='libTitle' v-on:change="save">
+            <div style="padding:10px;margin:10px">
+                <label class="custom-file-upload">
+                    <input type="file"  v-on:change="upload_img"/>
+                    Custom Upload
+                </label>
+            </div>
+        </div>
+    </section>
+</template>
+
+<!--文本导航模板-->
+<template id="t42">
+    <section id="count{{count}}" class="lib">
+        <!------------------------------display box--------------------------------->
+        <div class="display-box lib{{libId}}">
+            <a href="{{itemUrl1}}" target="_blank">
+            <span> {{libTitle}}</span>
+            </a>
+            <div  class="auxiliary-area">
+
+                <!--p class=" edit-lib-btn" >编辑</p-->
+                <p class="move-up-btn" v-on:click="moveUpLib">上移</p>
+                <p class="move-down-btn" v-on:click="moveDownLib">下移</p>
+                <p class=" add-lib-btn" data-count={{count}} onclick="resultFun=addLib({{count}})" >增加</p>
+                <p class="delete-lib-btn" v-on:click="deleteLib" >删除</p>
+            </div>
+        </div>
+
+        <!------------------------------edit box--------------------------------->
+        <div class="edit-box">
+            <p>这是编辑框    <span class="cancel-edit-box">X</span></p>
+            <input class="form-control" type="text" placeholder="请输入名称" v-model='libTitle' v-on:change="save">
+            <input class="form-control" type="text" placeholder="请输入链接地址" v-model='itemUrl1' v-on:change="save">
+
+        </div>
+    </section>
+</template>
+
+<!--header-->
+<header>
+    <p >欢迎来到本店</p>
+</header>
+
+<!--main content-->
+<article id="main">
+    <div id="hook"></div>
+    <div id="last-add-box" class="display-box"  >
+        <p>+</p>
+        <p>选择想要添加的模块</p>
+    </div>
+    <test></test>
+</article>
+
+<!--add box-->
+<article >
+    <div class="add-box">
+        <ul class="pagination">
+            <li onclick="javascript:switchPage(this,0)">基础</li>
+            <li onclick="javascript:switchPage(this,1)">图文</li>
+            <li onclick="javascript:switchPage(this,2)">推广</li>
+            <span class="cancel-add-box">X</span>
+        </ul>
+         <hr/>
+        <!--firstGroup-->
+        <div class="img-group">
+            <hr class="hr1"/>
+            <div class="img-item">
+                <p>标题栏</p>
+                <img src="./files/组件预览图/标题栏.PNG" alt="标题栏" onclick="resultFun('12','标题栏')">
+            </div>
+            <div class="img-item">
+                <p>图片导航</p>
+                <img src="./files/组件预览图/图片导航.PNG" alt="图片导航" onclick="resultFun('41','图片导航')">
+            </div>
+            <div class="img-item">
+                <p>文字导航</p>
+                <img src="./files/组件预览图/文字导航.PNG" alt="文字导航" onclick="resultFun('42','文字导航')">
+            </div>
+        </div>
+        <!--secondGroup-->
+        <div class="img-group" >
+            <hr class="hr2"/>
+            <div class="img-item">
+                <p>标题栏2</p>
+                <img src="./files/组件预览图/标题栏.PNG" alt="标题栏">
+            </div>
+            <div class="img-item">
+                <p>图片导航2</p>
+                <img src="./files/组件预览图/图片导航.PNG" alt="图片导航">
+            </div>
+            <div class="img-item">
+                <p>文字导航2</p>
+                <img src="./files/组件预览图/文字导航.PNG" alt="文字导航">
+            </div>
+        </div>
+
+        <!--thirdGroup-->
+        <div class="img-group" >
+            <hr class="hr3"/>
+            <div class="img-item">
+                <p>标题栏3</p>
+                <img src="./files/组件预览图/标题栏.PNG" alt="标题栏" v-on:click="selectLib('11')">
+            </div>
+            <div class="img-item">
+                <p>图片导航3</p>
+                <img src="./files/组件预览图/图片导航.PNG" alt="图片导航" v-on:click="selectLib('41')">
+            </div>
+            <div class="img-item">
+                <p>文字导航3</p>
+                <img src="./files/组件预览图/文字导航.PNG" alt="文字导航" v-on:click="selectLib('42')">
+            </div>
+        </div>
+
+    </div>
+</article>
+
+<!--footer-->
+<footer>
+    <div>
+    <span class="save-page">
+        保存页面
+    </span>
+    </div>
+</footer>
+
+<script>
+
+    /**************************************从后台获取数据，根据后台数据动态调用html模板********************/
+    var pageInfo = {$page_info};
+
+    //这里假设我们不需要用到dwt_id
+    //每一次展示之前都要将pageInfo根据row的大小排序(确保浏览器渲染组件的顺序由row的值来决定)
+    pageInfo.sort(function(x, y){
+        return (x['row'] - y['row']);
+    });
+
+    for(let i=0;i<pageInfo.length;i++) {
+
+        pageInfo[i]['row']=parseInt(pageInfo[i]['row']);
+
+        //在html中动态生成需要钩子
+        $("#hook").append("<row_"+pageInfo[i]['row']+"></row_" +pageInfo[i]['row']+">");
+
+        Vue.component('row_'+pageInfo[i]['row'], {
+            template: '#t' + pageInfo[i]['lib_id'],
+            data: function () {
+                return{
+                //control data
+                // count是确定当前组件位置的唯一可靠的标识，Vue.component名称中的row值只有在每次刷新页面后才能保持同步
+                count : i,
+                //lib data
+                libId : pageInfo[i]['lib_id'],
+                libTitle : pageInfo[i]['lib_title'],
+                row : pageInfo[i]['row'],
+                imgUrl1 : pageInfo[i]['img_url1'],
+                itemUrl1 : pageInfo[i]['item_url1'],
+                libNum : pageInfo[i]['lib_num'],
+                libNumMax : pageInfo[i]['lib_num_max']
+                }
+            },
+            methods:{
+                moveUpLib : function(){
+                    //在pageInfo层面更新数据
+                    if((this).count>0){
+                        var index=(this).count;
+                        //本行与上一行的row值对调
+                        pageInfo[index]['row']=(this).row-1;
+                        pageInfo[index-1]['row']=(this).row;
+
+                        pageInfo.sort(function(x, y){
+                            return (x['row'] - y['row']);
+                        });
+
+                        //在vue实例层面更新数据
+                        (this).$dispatch('child-msg',(this).count,'moveUpLib');
+
+                    }else{
+                        alert('不能上移');
+                    }
+                },
+
+                moveDownLib:function(){
+                    //在pageInfo层面更新数据
+                    if((this).count!==(pageInfo.length-1)){
+                        var index=(this).count;
+                        //本行与下一行的row值对调
+                        pageInfo[index]['row']=(this).row+1;
+                        pageInfo[index+1]['row']=(this).row;
+
+                        pageInfo.sort(function(x, y){
+                            return (x['row'] - y['row']);
+                        });
+
+                        //在vue实例层面更新数据
+                        (this).$dispatch('child-msg',(this).count,'moveDownLib');
+                    }else{
+                        alert('不能下移');
+                    }
+                },
+
+                deleteLib : function(){
+
+                    //在pageInfo层面更新数据
+                    pageInfo.splice((this).count,1);
+
+                    //更新后面Lib的row值
+                    var index=(this).count;
+                    for(index;index<pageInfo.length;index++){
+                        pageInfo[index]['row']=pageInfo[index]['row']-1;
+                    }
+
+                    //更新同类组件的libNum
+                    for(index=0;index<pageInfo.length;index++){
+                        if(pageInfo[index]['lib_id']==(this).libId){
+                            //alert('hi1');
+                            pageInfo[index]['lib_num'] =  pageInfo[index]['lib_num']-1;
+                        }
+                    }
+
+                    //在vue实例层面更新数据
+                    (this).$dispatch('child-msg',(this).count,'deleteLib');
+
+                    //在数据库层面更新数据
+                    //post_ajax(pageInfo);
+
+                    //在视觉层面删除组件
+                    (this).$el.remove();
+                },
+
+                save:function(){
+                    //以后还要加上其他修改的属性
+                    var index=(this).count;
+                    pageInfo[index]['lib_title']=(this).libTitle;
+                    pageInfo[index]['item_url1']=(this).itemUrl1;
+                    pageInfo[i]['item_url1']=(this).itemUrl1 ;
+                },
+
+                upload_img: function (event) {
+
+                    var target = $(event.target);
+
+                    //创建FormData对象
+                    var data = new FormData();
+                    //为FormData对象添加数据
+                    $.each(target[0].files, function (i, file) {
+                        data.append('upload_img', file);
+                    });
+
+                   // var index=(this).count;
+                    var ref=this;
+                    $.ajax({
+                        url: 'dwt_upload_img.php',
+                        type: 'POST',
+                        data: data,
+                        cache: false,
+                        contentType: false,        //不可缺参数
+                        processData: false,        //不可缺参数
+                        success: function (result) {
+                            if (result) {
+                                pageInfo[(ref).count]['img_url1']=result;
+                                (ref).imgUrl1=result;
+                            } else {
+                                alert('图片不符要求');
+                            }
+                        },
+                        error: function () {
+                            alert('上传失败');
+                        }
+                    });
+                }
+           },
+        });
+    }
+
+   var parent = new Vue({
+        el: '#main',
+       events: {
+           'child-msg': function (index, msg) {
+               if (msg == 'deleteLib') {
+                   //在vue实例层面删除选定的组件
+                   (this).$children.splice(index, 1);
+                   for (var i = index; i < pageInfo.length; i++) {
+                       //以后还要加上其他修改的属性
+                       (this).$children[i]['count'] = (this).$children[i]['count'] - 1;
+                       (this).$children[i]['libId'] = pageInfo[i]['lib_id'];
+                       (this).$children[i]['row'] = pageInfo[i]['row'];
+                       (this).$children[i]['libTitle'] = pageInfo[i]['lib_title'];
+                       (this).$children[i]['imgUrl1'] = pageInfo[i]['img_url1'];
+                       (this).$children[i]['libNum'] = pageInfo[i]['lib_num'];
+                       (this).$children[i]['libNumMax'] = pageInfo[i]['lib_num_max'];
+                   }
+               }
+               else if (msg == 'moveUpLib') {
+
+                   var prev = index - 1;
+                   //在视觉层面交换两个组件
+                   $('#count' + index).insertBefore($('#count' + prev));
+
+                   //在vue实例层面交换组件前的count值和row值
+                   (this).$children[prev]['count'] = (this).$children[prev]['count'] + 1;
+                   (this).$children[prev]['row'] = (this).$children[prev]['row'] + 1;
+
+                   (this).$children[index]['count'] = (this).$children[index]['count'] - 1;
+                   (this).$children[index]['row'] = (this).$children[index]['row'] - 1;
+
+                   //在vue实例层面交换上下两个组件
+                   var temp = (this).$children[prev];
+                   (this).$children[prev] = (this).$children[index];
+                   (this).$children[index] = temp;
+
+                   //保证vue实例中的组件按row的值排序
+                   (this).$children.sort(function (x, y) {
+                       return (x['row'] - y['row']);
+                   });
+               }
+               else if (msg == 'moveDownLib') {
+                   var next = index + 1;
+
+                   //在视觉层面交换两个组件
+                   $('#count' + index).insertAfter($('#count' + next));
+
+                   //交换组件前先修改其对应的count值和row值
+                   (this).$children[next]['count'] = (this).$children[next]['count'] - 1;
+                   (this).$children[next]['row'] = (this).$children[next]['row'] - 1;
+
+                   (this).$children[index]['count'] = (this).$children[index]['count'] + 1;
+                   (this).$children[index]['row'] = (this).$children[index]['row'] + 1;
+
+                   //在vue实例层面交换上下两个组件
+                   var temp = (this).$children[next];
+                   (this).$children[next] = (this).$children[index];
+                   (this).$children[index] = temp;
+
+                    //保证vue实例中的组件按row的值排序
+                   (this).$children.sort(function (x, y) {
+                       return (x['row'] - y['row']);
+                   });
+               }
+           }
+       }
+    });
+
+
+    /********************************************对add-box的处理******************************************/
+
+    //展开add-box 和突出当前选中的display-box
+    $('.add-lib-btn').on('click',function (event) {
+
+        event.stopPropagation();
+        $('.display-box').find('.auxiliary-area ').hide();
+
+        $('.edit-box').hide();
+        $('.add-box').show();
+
+        //突出当前选中的display-box
+        $('.selected-box').removeClass('selected-box');
+        $(this).parents('section').find('.display-box').addClass('selected-box');
+    });
+
+    //隐藏add-box
+    $('.cancel-add-box').on('click',function () {
+        $('.add-box').hide();
+    });
+
+    //用于框住add-box中的图片
+    $('.img-item').on('click',function () {
+        $('.img-border').removeClass('img-border');
+        $(this).find('img').addClass('img-border');
+    });
+
+    //把所有add-box中所有不是第一个img-group的元素都隐藏起来
+    $('.add-box').find(".img-group:not(:first)").hide();
+
+    /**************************************************对edit-box的处理*****************************/
+    //展开edit-box 和突出当前选中的display-box
+    $('.edit-lib-btn').on('click',function (event) {
+
+        event.stopPropagation();
+        $('.display-box').find('.auxiliary-area ').hide();
+
+        var thisEditBox= $(this).parents('section').find('.edit-box');
+        $('.edit-box').not(thisEditBox).hide();
+        $('.add-box').hide();
+        thisEditBox.show();
+
+        //选中当前的display-box
+        $('.selected-box').removeClass('selected-box');
+        $(this).parents('section').find('.display-box').addClass('selected-box');
+    });
+
+    //隐藏edit-box
+    $('.cancel-edit-box').on('click',function () {
+        $('.edit-box').hide();
+    });
+
+
+    /*************************************************对display-box 的处理****************************/
+    //首先隐藏所有auxiliary-area的内容
+    $('.display-box').find('.auxiliary-area ').hide();
+
+    //显示当前组件对应的display-box中auxiliary-area的内容
+    $('.display-box').mouseover(function(){
+        $('.display-box').find('.auxiliary-area ').hide();
+        $(this).find('.auxiliary-area').show();
+    });
+
+    //突出显示选中的display-box，打开edit-box
+    $('.display-box').not('#last-add-box').on('click',function(){
+
+        //删除之前选中display-box时，通过js增加的样式=>   $(this).css("outline","0px");即取消之前的覆盖作用
+        $('.display-box').removeAttr("style");
+        //移除所有display-box的mouse-over-display-box样式
+        $('.display-box').removeClass('mouse-over-display-box');
+        //移除所有display-box的selected-box样式
+        $('.selected-box').removeClass('selected-box');
+        //为当前组件对应的display-box增加selected-box样式
+        $(this).addClass('selected-box');
+        //覆盖当前组件对应的display-box本身的mouse-over-display-box样式
+        $(this).css("outline","0px");
+
+        //打开edit-box;
+        var thisEditBox= $(this).parents('section').find('.edit-box');
+        //隐藏不是当前组件对应的edit-box
+        $('.edit-box').not(thisEditBox).hide();
+        $('.add-box').hide();
+        //显示当前组件对应的edit-box
+        thisEditBox.show();
+
+    });
+
+    $('.display-box').hover(function(){
+        $('.display-box').removeClass('mouse-over-display-box');
+        $(this).addClass('mouse-over-display-box');
+    });
+
+    /************************************************对最后一个特殊add-box的处理****************************/
+    $("#last-add-box").on('click',function () {
+
+        //移除所有display-box的mouse-over-display-box样式
+        $('.display-box').removeClass('mouse-over-display-box');
+        //移除所有display-box的selected-box样式
+        $('.selected-box').removeClass('selected-box');
+        //隐藏所有的eidt-box;
+        $('.edit-box').hide();
+        //展开add-box
+        $('.add-box').show();
+
+        resultFun=addLib((pageInfo.length-1));
+
+    });
+
+    /************************************************对footer的处理*****************************************/
+    $('.save-page').on('click',function(){
+        $(this).css("background","#c1c1c1");
+        post_ajax(pageInfo);
+        //setTimeout(function(){  location.reload(); },500);
+    });
+
+    /************************************************以下代码是此js页面的公用函数**********************************/
+
+    //向后台发送数据
+    function post_ajax(pageInfo) {
+        //.post(url,parameters,callback)
+        //url         (字符串)服务器端资源地址。
+        //parameter   (对象)需要传递到服务器端的参数。 参数形式为“键/值”。
+        //callback    (函数)在请求完成时被调用。该函数参数依次为响应体和状态。
+        $.post('update_info.php', {
+            page_info:pageInfo
+        }, function (result) {
+            if (result) {
+                console.log(result);
+            }
+        })
+    }
+
+    //count确定究竟是第几个组件按下了add按钮
+    function addLib(count){
+
+        //libId确定需要增加的是哪个组件
+         return function(libId,info){
+                //取到此类lib可以用的最大数量和已经使用的数量
+                var maxLibNum,currentLibNum,index=0;
+
+                for(index;index<pageInfo.length;index++){
+                    if(pageInfo[index]['lib_id']==libId){
+                        maxLibNum=pageInfo[index]['lib_num_max'];
+                        currentLibNum=pageInfo[index]['lib_num'];
+                        //只要找到一个组件即可退出
+                        break;
+                    }
+                    else{
+                        //如果这个组件不曾出现在pageInfo 中，则默认最大组件数目为5
+                        currentLibNum=0;
+                        maxLibNum=3;
+                    }
+                }
+
+                if(currentLibNum<maxLibNum){
+                    //先把pageInfo深拷贝到temp中
+                    var temp = JSON.parse(JSON.stringify(pageInfo));
+
+                    //找到我们需要插入行的位置，temp[0]只是随便选一个来初始化一下
+                    temp[0]['lib_id'] = libId;
+                    temp[0]['row'] = count + 2;
+                    temp[0]['img_url1']="./files/user.png";
+                    temp[0]['lib_title']=info;
+                    temp[0]['lib_num']=currentLibNum;
+                    temp[0]['lib_num_max']=maxLibNum;
+
+                    //插入新行
+                    pageInfo.splice(count + 1, 0, temp[0]);
+
+                    //更新后面Lib的row值
+                    index = count + 2;
+                    for (index; index < pageInfo.length; index++) {
+                        pageInfo[index]['row'] = pageInfo[index]['row'] + 1;
+                    }
+
+                    //数一下同类组件有多少个
+                    var countLib=0;
+                    for(index=0;index<pageInfo.length;index++){
+                        if(pageInfo[index]['lib_id']==libId)
+                        {
+                            countLib++;
+                            pageInfo[index]['lib_num'] = countLib;
+                        }
+                    }
+
+                    //更新同类组件的个数
+                    for(index=0;index<pageInfo.length;index++){
+                        if(pageInfo[index]['lib_id']==libId)
+                        {
+                            pageInfo[index]['lib_num'] = countLib;
+                        }
+                    }
+                   post_ajax(pageInfo);
+                   setTimeout(function(){  location.reload(); },500);
+                }else{
+                    alert("组件数目超过限制");
+                }
+            }
+    }
+
+    //切换add-box页面
+    //para : ref 用于确定哪个<li>标签被选中
+    //para : index 用于确定要展示到那个页面
+    function switchPage(ref,index) {
+        $(ref).parents(".add-box").find(".img-group").not(":eq(index)").hide();
+        $(ref).parents(".add-box").find(".img-group").eq(index).show();
+    }
+
+</script>
+<!--下面是百度地图的js-->
+<!--script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YWdGplhYjUGQ3GtpKNeuTM2S"></1script>
+<script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
+<script>
+
+    $(function(){
+        navigator.geolocation.getCurrentPosition(translatePoint); //定位
+    });
+
+    //this is a callback function of getCurrentPosition
+    function translatePoint(position){
+        var currentLat = position.coords.latitude;
+        var currentLon = position.coords.longitude;
+        var gpsPoint = new BMap.Point(currentLon, currentLat);
+        BMap.Convertor.translate(gpsPoint, 0, initMap); //转换坐标
+    }
+
+    //this is a callback function of translate
+    function initMap(point){
+        map = new BMap.Map("map");
+        map.addControl(new BMap.NavigationControl());
+        map.addControl(new BMap.ScaleControl());
+        map.addControl(new BMap.OverviewMapControl());
+        map.centerAndZoom(point, 15);
+        map.addOverlay(new BMap.Marker(point))
+    }
+</script-->
+
+</body>
