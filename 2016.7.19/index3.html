@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--一下三行清除缓存-->
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <META HTTP-EQUIV="expires" CONTENT="0">
+
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/index3.css">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <link rel="stylesheet" href="styles/sweetalert.css">
+    <link rel="stylesheet" href="styles/google.css">
+    <script src='//cdn.tinymce.com/4/tinymce.min.js'></script>
+    <script src='js/myJs/zh_CN.js'></script>
+    <script>
+        tinymce.init({
+            selector: '.tinyMCE',
+            plugins: "save textcolor",
+            toolbar: "forecolor backcolor save",
+            save_onsavecallback: function () { console.log('Saved');}
+        })
+    </script>
+    <!--script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script-->
+
+    <script src="js/myJs/jquery.min.js"></script>
+    <script src="js/myJs/jquery-ui.js"></script>
+    <script src="js/myJs/jquery.ui.sortable-animation.js"></script>
+    <script src="js/myJs/vue.js"></script>
+    <script src="js/myJs/sweetalert-dev.js"></script>
+
+    <style type="text/css">
+        #allmap {width: 100%; height:300px; overflow: hidden;margin:0;font-family:"微软雅黑";}
+    </style>
+
+
+</head>
+
+<body>
+<!--辅助按钮模板-->
+<template id="auxiliary">
+    <div  class="auxiliary-area">
+        <p class="move-up-btn" v-on:mousedown.stop="moveUpLib">上移</p>
+        <p class="move-down-btn" v-on:mousedown.stop="moveDownLib">下移</p>
+        <p class=" add-lib-btn" v-on:mousedown.stop >增加</p>
+        <p  v-on:mousedown.stop="deleteLib">删除</p>
+    </div>
+</template>
+
+<!--第一类编辑框-->
+<template id="edit-type-1">
+<div class="edit-box">
+    <p>这是编辑框    <span class="cancel-edit-box">X</span></p>
+    <input class="form-control" type="text" placeholder="请输入名称" v-model='libTitle' v-on:keyUp="save">
+    <input class="form-control" type="text" placeholder="请输入链接地址" v-model='itemUrl1' v-on:keyUp="save">
+</div>
+</template>
+
+<!--第二类编辑框-->
+<template id="edit-type-2">
+    <div class="edit-box type-2" v-bind:class="{ 'soloCol': soloCol }">
+        <p>这是编辑框<span class="cancel-edit-box">X</span></p>
+        <div class="item-group">
+            <div class="item" v-for="item in imgs" track-by="id">
+                <label class="custom-file-upload">
+                    <img v-bind:src="item.imgUrl"/>
+                        <div class="test">
+                            <p>+</p>
+                            <p>请上传图片</p>
+                        </div>
+                    <input type="file"  v-on:change="upload_img($index, $event)"/>
+                </label>
+                <input class="form-control" type="text" placeholder="图片链接" v-model="item.itemUrl" v-on:keyUp="save">
+            </div>
+        </div>
+    </div>
+</template>
+
+<!--第三类编辑框-->
+<template id="edit-type-3">
+    <div class="edit-box type-3" style="position: absolute; left: 400px; top:-100px;width: 400px; height: 300px;">
+            <p>这是编辑框<span class="cancel-edit-box">X</span></p>
+            <textarea class="mytextarea tinyMCE">Hello, World!</textarea>
+            <button v-on:click="saveTest">save</button>
+    </div>
+</template>
+
+<!--增加框-->
+<template id="add-box">
+        <div class="add-box">
+            <ul class="pagination">
+                <li onclick="javascript:switchPage(this,0)">基础</li>
+                <li onclick="javascript:switchPage(this,1)">图文</li>
+                <li onclick="javascript:switchPage(this,2)">推广</li>
+                <span class="cancel-add-box">X</span>
+            </ul>
+            <hr/>
+            <!--firstGroup-->
+            <div class="img-group">
+                <hr class="hr1"/>
+                <div class="img-item">
+                    <!--onclick 用于更新pageInfo层面的数据  v-on用于更新component层面数据-->
+                    <p>标题栏</p>
+                    <img src="./files/组件预览图/标题栏.PNG" alt="标题栏"  v-on:click="addLib('12','标题栏')">
+                </div>
+                <div class="img-item">
+                    <p>图片导航</p>
+                    <img src="./files/组件预览图/图片导航.PNG" alt="图片导航"  v-on:click="addLib('41','图片导航')">
+                </div>
+                <div class="img-item">
+                    <p>文字导航</p>
+                    <img src="./files/组件预览图/文字导航.PNG" alt="文字导航"  v-on:click="addLib('42','文字导航')">
+                </div>
+            </div>
+            <!--secondGroup-->
+            <div class="img-group">
+                <hr class="hr2"/>
+                <div class="img-item">
+                    <p>标题栏2</p>
+                    <img src="./files/组件预览图/标题栏.PNG" alt="标题栏">
+                </div>
+                <div class="img-item">
+                    <p>图片导航2</p>
+                    <img src="./files/组件预览图/图片导航.PNG" alt="图片导航">
+                </div>
+                <div class="img-item">
+                    <p>文字导航2</p>
+                    <img src="./files/组件预览图/文字导航.PNG" alt="文字导航">
+                </div>
+            </div>
+            <!--thirdGroup-->
+            <div class="img-group" >
+                <hr class="hr3"/>
+                <div class="img-item">
+                    <p>标题栏3</p>
+                    <img src="./files/组件预览图/标题栏.PNG" alt="标题栏" v-on:click="selectLib('11')">
+                </div>
+                <div class="img-item">
+                    <p>图片导航3</p>
+                    <img src="./files/组件预览图/图片导航.PNG" alt="图片导航" v-on:click="selectLib('41')">
+                </div>
+                <div class="img-item">
+                    <p>文字导航3</p>
+                    <img src="./files/组件预览图/文字导航.PNG" alt="文字导航" v-on:click="selectLib('42')">
+                </div>
+            </div>
+        </div>
+</template>
+
+<!--last-add-box-->
+<template id="t0">
+    <section  id="count{{count}}" class="lib unsortable" >
+        <div id="last-add-box" class="display-box"  >
+            <p>+</p>
+            <p>选择想要添加的模块</p>
+        </div>
+        <add-box></add-box>
+    </section>
+</template>
+
+<!--搜索功能模板-->
+<template id="t11">
+    <section class="row{{row}} lib">
+    </section>
+</template>
+
+<!--进入商店模板-->
+<template id="t12" >
+    <section id="count{{count}}" class="lib" v-bind:class="{ 'class-invisible': invisible }">
+        <!------------------------------display box-------------------------------->
+        <div class="display-box ">
+            <div class="lib12">
+                <img  v-bind:src="imgs[0].imgUrl" alt="标题栏图片" >
+                <span>店铺名称： {{libTitle}}</span>
+                <auxiliary></auxiliary>
+            </div>
+        </div>
+        <!------------------------------edit box--------------------------------->
+        <edit-type-2></edit-type-2>
+        <!---------------------------------add box--------------------------------->
+        <add-box></add-box>
+    </section>
+</template>
+
+<!--辅助线模板-->
+<template id="t13">
+    <section class="row{{row}} lib">
+        <div class="display-box{{libId}}"  >
+            <div style="padding:5px; background: #eee">
+                <div style="background:#bbb; width:90% ;height: 1px;margin:auto;"></div>
+            </div>
+            <auxiliary></auxiliary>
+        </div>
+    </section>
+</template>
+
+<!--地图模板-->
+<template id="t14">
+    <section id="count{{count}}" class="lib"   v-bind:class="{ 'class-invisible': invisible }">
+
+        <div class="display-box">
+            <div class="lib14">
+             This is a map
+              <auxiliary></auxiliary>
+            </div>
+        </div>
+
+        <edit-type-3></edit-type-3>
+
+        <add-box></add-box>
+    </section>
+</template>
+
+<!--文字模块模板-->
+<template id="t23">
+    <section id="count{{count}}" class="lib"   v-bind:class="{ 'class-invisible': invisible }">
+        <!------------------------------display box--------------------------------->
+        <div class="display-box">
+            <div class="lib23">
+               <div>
+                   {{{libText}}}
+               </div>
+            </div>
+            <auxiliary></auxiliary>
+        </div>
+        <!------------------------------edit box--------------------------------->
+        <edit-type-3></edit-type-3>
+        <!------------------------------edit box--------------------------------->
+        <add-box></add-box>
+    </section>
+</template>
+
+<!--图片导航模板-->
+<template id="t41" >
+    <section id="count{{count}}" class="lib"  v-bind:class="{ 'class-invisible': invisible }" >
+        <!------------------------------display box--------------------------------->
+        <div class="display-box">
+            <div class="lib41" >
+                <div style="display:flex;" >
+                    <div class="show-box" v-for="imgItem in imgs" track-by="id">
+                        <img v-bind:src="imgItem.imgUrl"/>
+                        <a v-bind:href="imgItem.itemUrl" target="_blank"></a>
+                    </div>
+                </div>
+                <auxiliary></auxiliary>
+            </div>
+        </div>
+        <!---------------------------------edit box--------------------------------->
+        <edit-type-2></edit-type-2>
+        <!---------------------------------add box--------------------------------->
+        <add-box></add-box>
+    </section>
+</template>
+
+<!--文本导航模板-->
+<template id="t42">
+    <section id="count{{count}}" class="lib"   v-bind:class="{ 'class-invisible': invisible }">
+        <!------------------------------display box--------------------------------->
+        <div class="display-box">
+            <div class="lib42">
+                <a href="{{itemUrl1}}" target="_blank">
+                <span> {{libTitle}}</span>
+                </a>
+                <auxiliary></auxiliary>
+            </div>
+        </div>
+        <!------------------------------edit box--------------------------------->
+        <edit-type-1></edit-type-1>
+        <!------------------------------edit box--------------------------------->
+        <add-box></add-box>
+    </section>
+</template>
+
+<!--header-->
+<header>
+    <p >欢迎来到本店</p>
+</header>
+
+<!--main content-->
+<article id="main">
+    <div id="hook">
+        <div>
+            <img src="./files/head.PNG" style="width: 100%; margin:0 0 5px 0">
+        </div>
+    </div>
+</article>
+
+<!--footer-->
+<footer>
+    <div>
+    <span class="save-page">
+        保存页面
+    </span>
+    </div>
+</footer>
+
+<script>
+
+
+
+    /**************************************从后台获取数据，根据后台数据动态调用html模板********************/
+    var pageInfo = {$page_info};
+
+    //这里假设我们不需要用到dwt_id
+    //每一次展示之前都要将pageInfo根据row的大小排序(确保浏览器渲染组件的顺序由row的值来决定)
+    pageInfo.sort(function(x, y){
+        return (x['row'] - y['row']);
+    });
+
+    //注册右侧按钮栏组件
+    Vue.component('auxiliary',{
+        template:'#auxiliary',
+        methods:{
+            moveUpLib:function(){
+
+                (this).$parent.moveUpLib();
+
+
+            },
+            moveDownLib:function(){
+
+                (this).$parent.moveDownLib();
+
+            },
+            selectLib:function(){
+                (this).$parent.selectLib();
+            },
+            deleteLib:function(){
+
+                //弹出确认删除的对话框
+                var ref=this;
+                swal({
+                    title: "提示",
+                    text: "真的要删除这个组件吗?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "确认",
+                    cancelButtonText:"取消",
+                    closeOnConfirm: false,
+                    closeOnCancel:true
+                    },
+                    function(isConfirm){
+                        if(isConfirm){
+                            (ref).$parent.deleteLib();
+                            swal({
+                                title: "",
+                                text: "删除成功",
+                                type: "success",
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }else{
+
+                        }
+                    }
+                );
+            }
+        }
+    });
+
+    //注册第一类edit-box （文字和链接）
+    Vue.component('edit-type-1',{
+        template:'#edit-type-1',
+        data: function(){
+            return {
+                libTitle:(this).$parent.libTitle,
+                itemUrl1:(this).$parent.itemUrl1
+            }
+        },
+
+        methods:{
+            save:function(){
+                (this).$parent.libTitle=(this).libTitle;
+               // (this).$parent.itemUrl1=(this).itemUrl1;
+                (this).$parent.save();
+            }
+        }
+    });
+
+    //注册第二类edit-box（有4张以下图片和4个以下链接）
+    Vue.component('edit-type-2',{
+        template:'#edit-type-2',
+        data: function(){
+            return {
+                libId:(this).$parent.libId,
+                imgs:(this).$parent.imgs,
+                soloCol:false
+            }
+        },
+
+        computed:{
+             imgs:function(){
+
+                 var temp=[];
+
+                 //对数组进行深拷贝
+                 for(var i=0;i<(this).$parent.imgs.length;i++){
+                     temp.push((this).$parent.imgs[i]);
+                 }
+
+                 if((this).libId==41){
+                     return temp;
+                 }else if((this).libId==12){
+                     temp.splice(1,3);
+                     return temp;
+                 }
+             },
+
+            soloCol:function(){
+                if((this).libId==41){
+                    return false;
+                }else if((this).libId==12){
+                    return true;
+                }
+            }
+        },
+
+        methods:{
+            save:function(){
+
+                (this).$parent.libTitle=(this).libTitle;
+
+                if((this).libId==41) {
+                    (this).$parent.imgs = (this).imgs;
+                }else if((this).libId==12) {
+                    (this).$parent.imgs[0] = (this).imgs[0];
+                }
+
+                (this).$parent.save();
+            },
+            upload_img:function(index,event){
+                //因为数组从0开始计数，而自定义的
+                index=index+1;
+                var target = $(event.target);
+               (this).$parent.upload_img(target,index);
+            }
+        }
+    });
+
+    //注册第三类edit-box （带富文本编辑器）
+    Vue.component('edit-type-3',{
+        template:'#edit-type-3',
+
+        methods:{
+            saveTest:function(){
+                var testContent=(this).$el.children[2].value;
+                (this).$parent.uploadHtml(testContent);
+            }
+        }
+    });
+
+    //注册add-box
+    Vue.component('add-box',{
+        template:'#add-box',
+        methods:{
+            //把libId传进来了，稍后要把对应的隐藏组件显示，然后排序
+            addLib:function(libId,info){
+                (this).$parent.addLib(libId,info);
+            }
+        }
+    });
+
+    //注册各个子组件
+    for(let i=0;i<pageInfo.length;i++) {
+
+        pageInfo[i]['row']=parseInt(pageInfo[i]['row']);
+
+        //在html中动态生成需要钩子
+        $("#hook").append("<row_"+pageInfo[i]['row']+"></row_" +pageInfo[i]['row']+">");
+
+        Vue.component('row_'+pageInfo[i]['row'], {
+            template: '#t' + pageInfo[i]['lib_id'],
+            data: function () {
+                return {
+                    // control data
+                    count: i,//count是确定当前组件位置的唯一可靠的标识，Vue.component名称中的row值只有在每次刷新页面后才能保持同步
+                    invisible: false,
+                    lastAddBox:false,
+                    //lib data
+                    visibility: pageInfo[i]['visibility'],
+                    libId: pageInfo[i]['lib_id'],
+                    libTitle: pageInfo[i]['lib_title'],
+                    row: pageInfo[i]['row'],
+                    libNum: pageInfo[i]['lib_num'],
+                    libNumMax: pageInfo[i]['lib_num_max'],
+                    libText:pageInfo[i]['lib_text'],
+                    //external links
+                    imgUrl1: pageInfo[i]['img_url1'],
+                    itemUrl1: pageInfo[i]['item_url1'],
+                    imgUrl2: pageInfo[i]['img_url2'],
+                    itemUrl2: pageInfo[i]['item_url2'],
+                    imgUrl3: pageInfo[i]['img_url3'],
+                    itemUrl3: pageInfo[i]['item_url3'],
+                    imgUrl4: pageInfo[i]['img_url4'],
+                    itemUrl4: pageInfo[i]['item_url4'],
+                    //external links, 写成数组形式是为了使用v-for从而实现代码模块化和参数化
+                    imgs:[
+                        { id : 1,  imgUrl: pageInfo[i]['img_url1'], itemUrl:pageInfo[i]['item_url1'] },
+                        { id : 2,  imgUrl: pageInfo[i]['img_url2'], itemUrl:pageInfo[i]['item_url2'] },
+                        { id : 3,  imgUrl: pageInfo[i]['img_url3'], itemUrl:pageInfo[i]['item_url3'] },
+                        { id : 4,  imgUrl: pageInfo[i]['img_url4'], itemUrl:pageInfo[i]['item_url4'] }
+                            ]
+                }
+            },
+
+            computed: {
+                // 只要visibility一变，isA就会实时改变
+                invisible: function () {
+                    return((this).visibility==0);
+                },
+
+                lastAddBox:function(){
+                    return ((this).libId==0);
+                }
+
+            },
+
+            methods:{
+                moveUpLib : function(){
+
+                    //在pageInfo层面更新数据
+                    if((this).count>0){
+                        var index=(this).count;
+                        //本行与上一行的row值对调
+                        pageInfo[index]['row']=(this).row-1;
+                        pageInfo[index-1]['row']=(this).row;
+                        //保证pageInfo按row值大小排序
+                        pageInfo.sort(function(x, y){
+                            return (x['row'] - y['row']);
+                        });
+
+
+                        //在vue实例层面更新数据
+                        (this).$dispatch('moveUpLib',(this).count);
+
+
+                    }else{
+                        swal({
+                            title: "提示",
+                            text: "不能上移",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+
+                moveDownLib:function(){
+                    //在pageInfo层面更新数据
+                    var limit=visibilityNum();
+                    if((this).count<(limit-1)){
+                        var index=(this).count;
+                        //本行与下一行的row值对调
+                        pageInfo[index]['row']=(this).row+1;
+                        pageInfo[index+1]['row']=(this).row;
+
+                        //保证pageInfo按row值大小排序
+                        pageInfo.sort(function(x, y){
+                            return (x['row'] - y['row']);
+                        });
+
+                        //在vue实例层面更新数据
+                        (this).$dispatch('moveDownLib',(this).count);
+                    }else{
+                        swal({
+                            title: "提示",
+                            text: "不能下移",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+
+                deleteLib : function(){
+                    //将被删除的组件设置为隐藏
+                    pageInfo[(this).count]['visibility']=0;
+
+                    //其用户自定义的数据将被归为默认值
+                    pageInfo[(this).count]['lib_title']='';
+                    pageInfo[(this).count]['img_url1']='./files/dcr-default-bg504.jpg';
+                    pageInfo[(this).count]['item_url1']='';
+                    pageInfo[(this).count]['img_url2']='./files/dcr-default-bg504.jpg';
+                    pageInfo[(this).count]['item_url2']='';
+                    pageInfo[(this).count]['img_url3']='./files/dcr-default-bg504.jpg';
+                    pageInfo[(this).count]['item_url3']='';
+                    pageInfo[(this).count]['img_url4']='./files/dcr-default-bg504.jpg';
+                    pageInfo[(this).count]['item_url4']='';
+
+                    //将被删除的组件放到数组的最后
+                    var temp=pageInfo[(this).count];
+                    pageInfo.splice((this).count,1);
+                    pageInfo.push(temp);
+
+                    //更新同类组件的libNum以及更新整个pageInfo的row值
+                    for(var index=0;index<pageInfo.length;index++){
+                        pageInfo[index]['row']=index+1;
+                        if(pageInfo[index]['lib_id']==(this).libId){
+                            pageInfo[index]['lib_num'] =  pageInfo[index]['lib_num']-1;
+                        }
+                    }
+
+                    //在vue组件层面更新数据
+                    (this).$dispatch('deleteLib',(this).count);
+
+                },
+
+                addLib:function(libId,info){
+                    //首先在pageInfo层面更新数据
+                    var flag=addLibHelper((this).lastAddBox,(this).count,libId,info);
+                    //当组件数目足够时才更新vue实例
+                    if(flag){
+                        //在vue实例层面更新数据
+                        (this).$dispatch('addLib',(this).lastAddBox,(this).count,libId);
+                    }
+                },
+
+                save:function(){
+
+                    //以后还要加上其他修改的属性，这是自动调用的
+                    var index=(this).count;
+                    pageInfo[index]['lib_title']=(this).libTitle;
+                    //更新external links
+                    for (var i=1;i<=(this).imgs.length;i++){
+                        pageInfo[index]['item_url'+i]=(this).imgs[i-1]['itemUrl'];
+                        //这句可以没有，因为在upload_img时已经保存了 pageInfo[index]['img_url'+i]=(this).imgs[i-1]['imgUrl'];
+                    }
+                },
+
+                uploadHtml:function(testContent){
+
+                    pageInfo[(this).count]['lib_text']=testContent;
+
+                    (this).libText=testContent;
+
+                },
+
+                upload_img: function (target,index) {
+                    //创建FormData对象
+                    var data = new FormData();
+
+                    //为FormData对象添加数据
+                    $.each(target[0].files, function (i, file) {
+                        data.append('upload_img', file);
+                    });
+
+                    var ref=this;
+                    $.ajax({
+                        url: 'dwt_upload_img.php',
+                        type: 'POST',
+                        data: data,
+                        cache: false,
+                        contentType: false,        //不可缺参数
+                        processData: false,        //不可缺参数
+                        success: function (result) {
+                            if (result) {
+                                pageInfo[(ref).count]['img_url'+index]=result;
+                               for(var i=0;i<(ref).imgs.length;i++){
+                                   if((ref).imgs[i].id==index){
+                                       (ref).imgs[i].imgUrl=result;
+                                    }
+                               }
+                            } else {
+                                alert('图片不符要求');
+                            }
+                        },
+                        error: function () {
+                            alert('上传失败');
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+   var root = new Vue({
+       el: '#main',
+       events: {
+           'deleteLib': function (index) {
+               //对(this).$children实例进行类似于pageInfo的操作
+
+               //在dom层面更新数据
+               (this).$children[index]['visibility']=0;
+               var last=pageInfo.length-1;
+               $('#count'+index).insertAfter($('#count'+last));
+
+               //将被删除的组件放到数组的最后
+               var temp=(this).$children[index];
+               (this).$children.splice(index, 1);
+               (this).$children.push(temp);
+
+               //用pageInfo更新
+               for(var i=0;i<(this).$children.length;i++){
+
+                   (this).$children[i]['count']=pageInfo[i]['row']-1;
+                   (this).$children[i]['row']=pageInfo[i]['row'];
+
+                   (this).$children[i]['libTitle']=pageInfo[i]['lib_title'];
+                   (this).$children[i]['imgUrl1']=pageInfo[i]['img_url1'];
+                   (this).$children[i]['itemUrl1']=pageInfo[i]['item_url1'];
+                   (this).$children[i]['libNum']=pageInfo[i]['lib_num'];
+               }
+
+           },
+
+           'moveUpLib': function (index) {
+
+           /**********************这段代码没有人看得懂的，以后必须修改，以增加可读性*************************/
+               //在视觉层面交换组件前首先尝试关闭tinyMce
+                var prev = index - 1;
+                //下面这句是寻根问底的去寻找id啊!!!
+
+                if((this).$children[index].libId==23) {
+                                // 文字模块的component         EditType3      textarea
+                    var tinymceId = (this).$children[index].$children[1].$el.children[2].id;
+                    tinymce.execCommand('mceRemoveEditor', false, tinymceId);
+                }
+
+               //在视觉层面交换两个组件
+               var t =  $('#count' + index);
+               var th=t.outerHeight(true)+10;
+               var tp= $('#count' + prev);
+               var tph= tp.outerHeight(true)+10;
+
+               t.animate({top: -tph},300, function(){
+                      t.css('top', '0px');
+                   });
+
+               var ref=this;
+               tp.animate({top:th},300,function(){
+                   tp.css('top','0px');
+                    t.insertBefore(tp);
+                   //在视觉层重启tinymce
+                   tinymce.execCommand('mceAddEditor', true, tinymceId);
+               });
+
+
+               //在vue实例层面交换组件前的count值和row值
+               (this).$children[prev]['count'] = (this).$children[prev]['count'] + 1;
+               (this).$children[prev]['row'] = (this).$children[prev]['row'] + 1;
+
+               (this).$children[index]['count'] = (this).$children[index]['count'] - 1;
+               (this).$children[index]['row'] = (this).$children[index]['row'] - 1;
+
+
+               //在vue实例层面交换上下两个组件
+               var temp = (this).$children[prev];
+               (this).$children[prev] = (this).$children[index];
+               (this).$children[index] = temp;
+
+               //保证vue实例中的组件按row的值排序
+               (this).$children.sort(function (x, y) {
+                   return (x['row'] - y['row']);
+               });
+           },
+
+           'moveDownLib': function (index) {
+               var next = index + 1;
+
+               //在视觉曾关闭实例
+               if((this).$children[index].libId==23) {
+                   var tinymceId = (this).$children[index].$children[1].$el.children[2].id;
+                   tinymce.execCommand('mceRemoveEditor', false, tinymceId);
+               }
+               //在视觉层面交换两个组件
+               var t =  $('#count' + index);
+               var th=t.outerHeight(true)+10;
+               var tn= $('#count' + next);
+               var tnh= tn.outerHeight(true)+10;
+
+               t.animate({top: tnh}, 300, function(){
+                   t.css('top', '0px');
+               });
+
+               var ref=this;
+
+               tn.animate({top:-th},300,function(){
+                   tn.css('top','0px');
+                   t.insertAfter(tn);
+
+                   //在视觉层重启tinymce
+                   tinymce.execCommand('mceAddEditor', true, tinymceId);
+               });
+
+               //交换组件前先修改其对应的count值和row值
+               (this).$children[next]['count'] = (this).$children[next]['count'] - 1;
+               (this).$children[next]['row'] = (this).$children[next]['row'] - 1;
+
+               (this).$children[index]['count'] = (this).$children[index]['count'] + 1;
+               (this).$children[index]['row'] = (this).$children[index]['row'] + 1;
+
+               //在vue实例层面交换上下两个组件
+               var temp = (this).$children[next];
+               (this).$children[next] = (this).$children[index];
+               (this).$children[index] = temp;
+
+               //保证vue实例中的组件按row的值排序
+               (this).$children.sort(function (x, y) {
+                   return (x['row'] - y['row']);
+               });
+           },
+
+           'addLib': function (lastAddBox,count, libId) {
+
+               //在这个函数的运行过程中count值是永远不变的
+               //对(this).$children 做类似于pageInfo的操作
+
+                //数一数有多少个组件是可见的
+               var visCompNum = 0;
+               for (var i = 0; i < (this).$children.length; i++) {
+                   if ((this).$children[i]['visibility'] == 1) {
+                       visCompNum++;
+                   }
+               }
+
+               var  index=visCompNum;
+                //找出第一个隐藏的同类Lib并把它显示出来
+               for(index;index<(this).$children.length;index++){
+                       if ((this).$children[index]['libId'] == libId){
+                           (this).$children[index]['visibility']=1;
+                            break;
+                       }
+                   }
+
+                //在视图层面更新组件（把显示出来的组件插入到count的后面）
+                if(!lastAddBox) {
+                   $('#count' + index).insertAfter($('#count' + count));
+               }
+                else{
+                   $('#count' + index).insertBefore($('#count' + count));
+               }
+
+                //在vue实例层面更换两个组件
+
+                //把隐藏给temp
+                var temp = (this).$children[index];
+                //把隐藏行删除
+                (this).$children.splice(index, 1);
+
+                if(!lastAddBox) {
+                   //把temp插到count行后面
+                   (this).$children.splice(count + 1, 0, temp);
+               }else{
+                    //把temp插到last edit box前面
+                   (this).$children.splice(count, 0, temp);
+               }
+
+               //根据pageInfo的数据更新Vue组件
+                for( i=0;i<(this).$children.length;i++){
+
+                    (this).$children[i]['count']=pageInfo[i]['row']-1;
+                    (this).$children[i]['row']=pageInfo[i]['row'];
+                    (this).$children[i]['libTitle']=pageInfo[i]['lib_title'];
+                    (this).$children[i]['libNum']=pageInfo[i]['lib_num'];
+
+                    for(var j=1;j<=4;j++) {
+
+                        (this).$children[i].imgs[j-1].imgUrl = pageInfo[i]['img_url'+j];
+                        (this).$children[i].imgs[j-1].itemUrl= pageInfo[i]['item_url'+j];
+                    }
+                }
+
+           }
+       }
+    });
+
+    //下面这段代码一定要加上，保证Vue实例children数组的顺序与component的注册顺序（即pageInfo中row的顺序一致)
+    //这是为了以防万一，暂时不知道为什么不这么写会出错，反正加上就没错
+    root.$children.sort(function (x, y) {
+        return (x['row'] - y['row']);
+    });
+    /*******************************************drug and drop**************************************/
+    $(function() {
+       // All necessary information can be found in the following website http://api.jqueryui.com/sortable/
+        $( "#hook" ).sortable({
+            cursor: "move",
+            distance: 30,
+            cursorAt: { top: 50, left: 200 },
+            items :"section:not(.unsortable)",
+            opacity: 0.6,
+            revert: true,
+            revert: 200,
+            containment: '#hook',
+            helper: 'clone',
+            appendTo: 'body',
+            zIndex: 100,
+            animation: 300,
+            start: function (e, ui) {
+                //开始移动前关闭所有ui的tinymce实例
+                $(ui.item).find('textarea').each(function (){
+                    tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                });
+            },
+            stop: function (e, ui) {
+                // 移动结束后重新打开所有ui的tinymce实例
+                $(ui.item).find('textarea').each(function () {
+                    tinymce.execCommand('mceAddEditor', true, $(this).attr('id'));
+                });
+            },
+
+            //This event is triggered when the user stopped sorting and the DOM position has changed.
+            update : function(event, ui){
+                var array=$(this).sortable("toArray"),index;
+                for (var i=0;i<visibilityNum();i++){
+                    //用正则表达式取出拖拽后的组件的排序
+                    index=parseInt(array[i].replace(/(count)/g, ''), 10);
+                    //在pageInfo层面更新数据
+                    pageInfo[index]['row']=i+1;
+                    //vue实例层面更新数据
+                    (root).$children[index]['count']=i;
+                    (root).$children[index]['row']=i+1;
+                }
+                pageInfo.sort(function (x, y) {
+                    return (x['row'] - y['row']);
+                });
+                (root).$children.sort(function(x,y){
+                    return(x['row']-y['row']);
+                });
+
+            }
+        });
+    });
+
+
+    /****************************************对display-box 的处理****************************************/
+    //首先隐藏所有auxiliary-area的内容
+    $('.display-box').find('.auxiliary-area ').hide();
+
+    //突出显示选中的display-box，打开edit-box
+    $('.display-box').not('#last-add-box').on('click',function(){
+        //显示当前组件对应的display-box中auxiliary-area的内容
+        $('.display-box').find('.auxiliary-area ').hide();
+        $(this).find('.auxiliary-area').show();
+        //删除之前选中display-box时，通过js增加的样式=>   $(this).css("outline","0px");即取消之前的覆盖作用
+        $('.display-box').removeAttr("style");
+        //移除所有display-box的mouse-over-display-box样式
+        $('.display-box').removeClass('mouse-over-display-box');
+        //移除所有display-box的selected-box样式
+        $('.selected-box').removeClass('selected-box');
+        //为当前组件对应的display-box增加selected-box样式
+        $(this).addClass('selected-box');
+        //覆盖当前组件对应的display-box本身的mouse-over-display-box样式
+        $(this).css("outline","0px");
+
+        //打开edit-box;
+        var thisEditBox= $(this).parents('section').find('.edit-box');
+        //隐藏不是当前组件对应的edit-box
+        $('.edit-box').not(thisEditBox).hide();
+
+        //显示当前组件对应的edit-box
+        thisEditBox.show();
+
+        //隐藏add-box
+        $('.add-box').hide();
+
+    });
+
+    //这段功能是为了使drug and drop 不离开 #hook 而隐藏的
+    $('.display-box').mousedown(function(){
+        $('.auxiliary-area').hide();
+        $('.edit-box').hide();
+        $('.display-box').removeClass('selected-box');
+    });
+
+    //添加鼠标经过的按钮
+    $('.display-box').hover(function(){
+        $('.display-box').removeClass('mouse-over-display-box');
+        $(this).addClass('mouse-over-display-box');
+    });
+
+    /********************************************对add-box的处理******************************************/
+    //展开add-box 和突出当前选中的display-box
+    $('.add-lib-btn').on('click',function (event) {
+        event.stopPropagation();
+
+        $('.edit-box').hide();
+        $(this).parents('section').find('.add-box').show();
+
+        //突出当前选中的display-box
+        $('.selected-box').removeClass('selected-box');
+        $(this).parents('section').find('.display-box').addClass('selected-box');
+    });
+
+    //按下关闭按钮，隐藏add-box
+    $('.cancel-add-box').on('click',function (event) {
+        event.stopPropagation();
+        $('.add-box').hide();
+    });
+
+    //选中img-item，隐藏add-box
+    $('.img-item').on('click',function (event) {
+        event.stopPropagation();
+        $('.add-box').hide();
+    });
+
+    //把所有add-box中所有不是第一个img-group的元素都隐藏起来,一下三种方法都可以实现功能
+    //$('.add-box').find(".img-group:not(:first)").hide();
+    //$('.add-box').find(".img-group:not(:eq(0))").hide();
+    $('.add-box').find(".img-group:gt(0)").hide();
+
+    /**************************************************对edit-box的处理*****************************/
+    $('.cancel-edit-box').on('click',function () {
+        $('.edit-box').hide();
+    });
+
+    /************************************************对最后一个特殊add-box的处理****************************/
+    $("#last-add-box").on('click',function (event) {
+        event.stopPropagation();
+        //移除所有display-box的mouse-over-display-box样式
+        //移除所有display-box的selected-box样式
+        $('.selected-box').removeClass('selected-box');
+        //隐藏所有的edt-box;
+        $('.edit-box').hide();
+        //隐藏所有的auxiliary-area;
+        $('.auxiliary-area').hide();
+        //展开add-box
+        $(this).parents('section').find('.add-box').show();
+    });
+
+    /************************************************对footer的处理*****************************************/
+    $('.save-page').on('click',function(){
+        post_ajax(pageInfo);
+    });
+
+    /*********************************以下代码是此js页面的公用函数**********************************/
+    //向后台发送数据
+    function post_ajax(pageInfo) {
+        //.post(url,parameters,callback)
+        //url         (字符串)服务器端资源地址。
+        //parameter   (对象)需要传递到服务器端的参数。 参数形式为“键/值”。
+        //callback    (函数)在请求完成时被调用。该函数参数依次为响应体和状态。
+        $.post('update_info.php', {
+            page_info:pageInfo
+        }, function (result) {
+            if (result) {
+                swal({
+                    title: "",
+                    text: "页面保存成功成功",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        })
+    }
+
+    //count确定究竟是第几个组件按下了add按钮,此函数用于更新pageInfo层面的数据
+    function addLibHelper(lastAddBox,count,libId,info){
+
+            //取到此类lib可以用的最大数量和已经使用的数量
+            var maxLibNum,currentLibNum=0;
+
+            //取得maxLibNum的值
+            for(var i=0;i<pageInfo.length;i++){
+                if(pageInfo[i]['lib_id']==libId){
+                    maxLibNum=pageInfo[i]['lib_num_max'];
+                  //  currentLibNum=pageInfo[index]['lib_num'];
+                    //只要找到一个组件即可退出
+                    break;
+                }
+            }
+
+            //为了以防万一，currentLibNum再数一次(启动容错机制)
+            for(i=0;i<pageInfo.length;i++){
+                if(pageInfo[i]['lib_id']==libId &&  pageInfo[i]['visibility']==1 ){
+                    currentLibNum++;
+                }
+            }
+
+            if(currentLibNum<maxLibNum) {
+                   var index = visibilityNum(pageInfo);
+                    for (index; index < pageInfo.length; index++) {
+                        //找到的第index行要插到第count行后面
+                        if (pageInfo[index]['lib_id'] == libId) {
+                            pageInfo[index]['visibility'] = 1;
+                            pageInfo[index]['lib_title'] = info;
+
+                            for(i=1;i<=4;i++) {
+                                pageInfo[index]['img_url'+i] = "./files/dcr-default-bg504.jpg";
+                                pageInfo[index]['item_url'+i]='';
+                            }
+
+                            //把隐藏给temp
+                            var temp = pageInfo[index];
+                            //把隐藏行删除
+                            pageInfo.splice(index, 1);
+
+                            if(!lastAddBox){//把temp插到count行后面
+                                pageInfo.splice(count + 1, 0, temp);
+                                }else {//把temp插到last-add-box前面
+                                pageInfo.splice(count, 0, temp);
+                            }
+
+                            //对lib_num进行更新
+                            for(index=0;index<pageInfo.length;index++){
+                                if(pageInfo[index]['lib_id']==libId)
+                                {
+                                    pageInfo[index]['lib_num'] = currentLibNum+1;
+                                }
+                            }
+
+                            //根据pageInfo 的结构更新其row 值
+                            for (var j = 0; j < pageInfo.length; j++) {
+                                pageInfo[j]['row'] = j + 1;
+                            }
+
+                            //对pageInfo重新排序
+                            pageInfo.sort(function (x, y) {
+                                return (x['row'] - y['row']);
+                            });
+
+                            //找到一个就足够了
+                            break;
+                        }
+                    }
+                return true
+            }
+            else{
+                swal({
+                    title: "提示",
+                    text:"抱歉，此类组件已经用完",
+                    showConfirmButton: true
+                });
+                    return false
+            }
+    }
+
+    //切换add-box页面
+    //para : ref 用于确定哪个<li>标签被选中
+    //para : index 用于确定要展示到那个页面
+    function switchPage(ref,index) {
+        $(ref).parents(".add-box").find(".img-group").not(":eq(index)").hide();
+        $(ref).parents(".add-box").find(".img-group").eq(index).show();
+    }
+
+    //计算pageInfo可见组件个数
+    function visibilityNum(){
+
+        var result=0;
+
+        for (var i=0;i<pageInfo.length;i++){
+            if(pageInfo[i]['visibility']=='1'){
+                result++;
+            }
+        }
+
+        return result-1;
+    }
+
+</script>
+
+<!--script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YWdGplhYjUGQ3GtpKNeuTM2S"></script-->
+
+</body>
+</html>
